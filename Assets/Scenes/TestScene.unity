@@ -690,7 +690,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   planetParent: {fileID: 841348485}
-  sizeChangeSpeed: 1.001
+  sizeChangeSpeed: 1.003
   text: {fileID: 1049028254}
 --- !u!1 &551259204
 GameObject:
