@@ -8,12 +8,14 @@ public class PlayerController : MonoBehaviour
     CharacterController characterController;
 
     public float speed;
-    private Vector2 moveVector = Vector2.zero;   
+    private Vector2 moveVector = Vector2.zero;
+    private Rigidbody2D rb;
 
     //Accessing charController
     private void Start()
     {
         characterController = GetComponent<CharacterController>();
+        rb = GetComponent<Rigidbody2D>();
     }
 
     //Subbing and unsubbing
@@ -30,7 +32,7 @@ public class PlayerController : MonoBehaviour
     //Will perform the logic to move the player using controllers built in Move method
     private void MovePlayer(Vector2 InputVector)
     {
-        characterController.Move(speed * Time.deltaTime * InputVector);
+        rb.velocity = new Vector2(InputVector.x * speed, InputVector.y * speed);
     }    
 
     //Using this method as a means to toggle the action of the main method MovePlayer
@@ -40,7 +42,7 @@ public class PlayerController : MonoBehaviour
     }
 
     //Running the main method through update for constant movement when button is held
-    private void Update()
+    private void FixedUpdate()
     {
         MovePlayer(moveVector);
     }
