@@ -1,24 +1,23 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.Rendering;
+using UnityEngine.Tilemaps;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    CharacterController characterController;
-
     public float speed;
-    private Vector2 moveVector = Vector2.zero;
+    private Vector3 moveVector = Vector2.zero;
     private Rigidbody2D rb;
 
-    //Accessing charController
+    private Bounds mapBoundary;
+    public Tilemap map;   
+
     private void Start()
     {
-        characterController = GetComponent<CharacterController>();
+        mapBoundary = map.localBounds;
+        mapBoundary.size *= 0.8f; //shrinking bounds to better represent the visible tilemap
         rb = GetComponent<Rigidbody2D>();
-    }
+    }   
 
-    //Subbing and unsubbing
+    // Subbing and unsubbing
     private void OnEnable()
     {
         Actions.MoveEvent += UpdateMoveVector;
@@ -26,24 +25,38 @@ public class PlayerController : MonoBehaviour
 
     private void OnDisable()
     {
-        Actions.MoveEvent -= UpdateMoveVector;        
-    }    
+        Actions.MoveEvent -= UpdateMoveVector;
+    }
 
-    //Will perform the logic to move the player using controllers built in Move method
-    private void MovePlayer(Vector2 InputVector)
-    {
-        rb.velocity = new Vector2(InputVector.x * speed, InputVector.y * speed);
-    }    
-
-    //Using this method as a means to toggle the action of the main method MovePlayer
     private void UpdateMoveVector(Vector2 InputVector)
     {
         moveVector = InputVector;
     }
 
-    //Running the main method through update for constant movement when button is held
     private void FixedUpdate()
-    {
-        MovePlayer(moveVector);
+    {       
+        Vector2 newPosition = transform.position + speed * Time.fixedDeltaTime * moveVector;
+
+        //check if the new position is outside the map's bounds
+        //left side was not lining up with the visible tilemap. hard coded a small offset to fix it.
+        if (newPosition.x < mapBoundary.min.x - 2)
+        {
+            newPosition.x = mapBoundary.min.x - 2; 
+        }
+        if (newPosition.x > mapBoundary.max.x)
+        {
+            newPosition.x = mapBoundary.max.x;  
+        }
+        if (newPosition.y < mapBoundary.min.y)
+        {
+            newPosition.y = mapBoundary.min.y;  
+        }
+        if (newPosition.y > mapBoundary.max.y)
+        {
+            newPosition.y = mapBoundary.max.y;  
+        }
+
+        // Apply the adjusted position
+        transform.position = newPosition;          
     }
 }
